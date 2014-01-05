@@ -10,5 +10,11 @@ urlpatterns = patterns(
         views.simple,
         name='simple'),
 
+    url(r'^login/simple/$',
+        views.login_simple,
+        name='login_simple'),
+
+    url(r'^auth/', include('django.contrib.auth.urls')),
+
     url(r'^backward/', include('backward.urls')),
 )

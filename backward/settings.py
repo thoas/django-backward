@@ -19,6 +19,8 @@ if not hasattr(settings, 'BACKWARD_START_IGNORE_URLS'):
 
     if settings.STATIC_URL and settings.STATIC_URL.startswith('/'):
         START_IGNORE_URLS += (settings.STATIC_URL, )
+else:
+    START_IGNORE_URLS = settings.BACKWARD_START_IGNORE_URLS
 
 END_IGNORE_URLS = getattr(settings, 'BACKWARD_END_IGNORE_URLS', (
     '.xml',

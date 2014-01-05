@@ -1,6 +1,7 @@
 import importlib
 
 from django.test import TestCase
+from django.contrib.auth.models import User
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.conf import settings as djsettings
@@ -49,3 +50,34 @@ class BasicTests(TestCase):
             self.assertEqual(response.status_code, 200)
 
             self.assertNotIn('url_redirect', self.client.session)
+
+    def test_login_redirect(self):
+        with override_settings(BACKWARD_START_IGNORE_URLS=(
+            '/auth/',
+        )):
+            reload(settings)
+
+            response = self.client.get(reverse('login_simple'))
+
+            self.assertEqual(response.status_code, 302)
+
+            self.assertEqual(self.client.session['url_redirect'], u'http://testserver/login/simple/')
+
+            User.objects.create_user('newbie', 'newbie@example.com', '$ecret')
+
+            response = self.client.post(reverse('login'), data={
+                'username': 'newbie',
+                'password': '$ecret'
+            })
+
+            self.assertRedirects(response,
+                                 '/backward/login/redirect/',
+                                 status_code=302,
+                                 target_status_code=302)
+
+            response = self.client.get(reverse('backward_login_redirect'))
+
+            self.assertRedirects(response,
+                                 'http://testserver/login/simple/',
+                                 status_code=302,
+                                 target_status_code=200)
