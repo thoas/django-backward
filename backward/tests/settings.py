@@ -20,7 +20,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'social.apps.django_app.default',
     'backward',
     'backward.tests',
 ]
