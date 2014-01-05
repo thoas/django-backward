@@ -8,7 +8,7 @@ from . import settings
 
 class BackwardMiddleware(object):
     def _is_exempt(self, request):
-        exemptions = settings.IGNORE_URLS
+        exemptions = settings.IGNORE_VIEWNAMES
 
         result = False
 
@@ -18,17 +18,21 @@ class BackwardMiddleware(object):
             try:
                 match = resolve(path_info)
             except Resolver404:
-                return False
-
-            result = match and (match.url_name in exemptions)
+                pass
+            else:
+                result = match and (match.url_name in exemptions)
 
         if result is False:
+            for url in settings.IGNORE_URLS:
+                if url == path_info:
+                    return True
+
             result = path_info.startswith(settings.START_IGNORE_URLS) \
                 or path_info.endswith(settings.END_IGNORE_URLS)
 
         return result
 
-    def redirect_to_previous(self, request):
+    def manage_redirection(self, request):
         update_url_redirect = True
 
         url_redirect = get_url_redirect(request)
@@ -38,7 +42,7 @@ class BackwardMiddleware(object):
 
         if update_url_redirect:
             url_redirect = '%s://%s%s' % (scheme(request),
-                                          request.META.get('HTTP_HOST'),
+                                          request.get_host(),
                                           request.path_info)
 
         set_url_redirect(request, url_redirect)
@@ -47,7 +51,7 @@ class BackwardMiddleware(object):
         if self._is_exempt(request):
             return
 
-        result = self.redirect_to_previous(request)
+        result = self.manage_redirection(request)
         if result:
             return result
 

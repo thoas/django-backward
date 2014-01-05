@@ -70,7 +70,7 @@ def run_next_action(request):
                     return HttpResponseRedirect(data['redirect_url'])
 
                 return HttpResponseRedirect('%s://%s%s' % (scheme(request),
-                                                           request.META.get('HTTP_HOST'),
+                                                           request.get_host(),
                                                            settings.LOGIN_REDIRECT_URL))
         except Exception as e:
             logging.error(e)

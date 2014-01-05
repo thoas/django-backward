@@ -48,3 +48,5 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'backward.middleware.BackwardMiddleware',
 )
+
+LOGIN_REDIRECT_URL = '/backward/login/redirect/'
