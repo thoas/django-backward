@@ -1,10 +1,9 @@
-import importlib
-
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.conf import settings as djsettings
+from django.utils import importlib
 
 from backward import settings
 
