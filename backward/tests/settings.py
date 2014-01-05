@@ -27,7 +27,7 @@ INSTALLED_APPS = [
 
 SECRET_KEY = 'blabla'
 
-ROOT_URLCONF = 'backward.urls'
+ROOT_URLCONF = 'backward.tests.urls'
 
 try:
     from .temp import *  # noqa
@@ -37,3 +37,14 @@ except ImportError:
 
 if django.VERSION <= (1, 6):
     TEST_RUNNER = 'discover_runner.DiscoverRunner'
+
+
+MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'backward.middleware.BackwardMiddleware',
+)
