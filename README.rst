@@ -41,6 +41,7 @@ Installation
     )
 
 3. Add ``backward.urls`` to your ``urls.py`` ::
+
     # urls.py
 
     from django.conf.urls import patterns, url, include
