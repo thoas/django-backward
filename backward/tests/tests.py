@@ -20,6 +20,13 @@ class BasicTests(TestCase):
 
         reload(settings)
 
+    def test_ajax_simple(self):
+        response = self.client.get(reverse('simple'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertNotIn('url_redirect', self.client.session)
+
     def test_simple(self):
         response = self.client.get(reverse('simple'))
 

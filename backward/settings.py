@@ -38,3 +38,7 @@ DEFAULT_REDIRECT_URL = getattr(settings,
 LOGIN_URL = getattr(settings,
                     'BACKWARD_LOGIN_URL',
                     settings.LOGIN_URL)
+
+IGNORE_AJAX = getattr(settings,
+                      'BACKWARD_IGNORE_AJAX',
+                      True)

@@ -8,6 +8,9 @@ from . import settings
 
 class BackwardMiddleware(object):
     def _is_exempt(self, request):
+        if request.is_ajax() and settings.IGNORE_AJAX:
+            return True
+
         exemptions = settings.IGNORE_VIEWNAMES
 
         result = False
