@@ -34,3 +34,7 @@ NEXT_ACTION_NAME = getattr(settings, 'BACKWARD_NEXT_ACTION_NAME', 'next_action')
 DEFAULT_REDIRECT_URL = getattr(settings,
                                'BACKWARD_DEFAULT_REDIRECT_URL',
                                '/')
+
+LOGIN_URL = getattr(settings,
+                    'BACKWARD_LOGIN_URL',
+                    settings.LOGIN_URL)

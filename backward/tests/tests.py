@@ -80,3 +80,30 @@ class BasicTests(TestCase):
                                  'http://testserver/login/simple/',
                                  status_code=302,
                                  target_status_code=200)
+
+    def test_action_simple(self):
+        with override_settings(BACKWARD_START_IGNORE_URLS=(
+            '/auth/',
+        )):
+            reload(settings)
+
+            parameters = {
+                'key': 'value'
+            }
+
+            response = self.client.post(reverse('action_simple'), data=parameters)
+
+            self.assertEqual(response.status_code, 302)
+
+            User.objects.create_user('newbie', 'newbie@example.com', '$ecret')
+
+            response = self.client.post(reverse('login'), data={
+                'username': 'newbie',
+                'password': '$ecret'
+            })
+
+            response = self.client.get(reverse('backward_login_redirect'))
+
+            for k, v in parameters.items():
+                self.assertIn(k, self.client.session)
+                self.assertEqual(self.client.session[k], v)

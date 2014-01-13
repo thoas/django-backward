@@ -9,6 +9,8 @@ from .utils import scheme
 
 from . import settings
 
+logger = logging.getLogger('backward')
+
 
 def get_url_redirect(request):
     return request.session.get(settings.URL_REDIRECT_NAME, None)
@@ -32,7 +34,7 @@ def get_next_action(request):
 def delete_next_action(request):
     try:
         del request.session[settings.NEXT_ACTION_NAME]
-    except ValueError:
+    except KeyError:
         pass
 
 
@@ -42,12 +44,25 @@ def run_next_action(request):
     try:
         data = get_next_action(request)
     except Exception, e:
-        logging.error(e)
+        logger.error(e)
 
     if not data or not 'action' in data:
         return False
 
     action = data['action']
+
+    args = data.get('args', None) or []
+
+    kwargs = data.get('kwargs', None) or {}
+    kwargs['data'] = data
+
+    if 'method' in data:
+        request.method = data['method']
+
+    parameters = data.get('parameters', None) or {}
+
+    for key, values in parameters.items():
+        setattr(request, key, values)
 
     view_name = action[action.rindex('.') + 1:]
 
@@ -59,7 +74,7 @@ def run_next_action(request):
         view = getattr(module, view_name)
 
         try:
-            result = view(request, data=data)
+            result = view(request, *args, **kwargs)
 
             delete_next_action(request)
 
@@ -73,6 +88,6 @@ def run_next_action(request):
                                                            request.get_host(),
                                                            settings.LOGIN_REDIRECT_URL))
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
 
     return False

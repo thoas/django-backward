@@ -48,12 +48,11 @@ class BackwardMiddleware(object):
         set_url_redirect(request, url_redirect)
 
     def process_request(self, request):
-        if self._is_exempt(request):
-            return
+        if not self._is_exempt(request):
+            result = self.manage_redirection(request)
 
-        result = self.manage_redirection(request)
-        if result:
-            return result
+            if result:
+                return result
 
         if request.user and request.user.is_authenticated():
             result = run_next_action(request)
