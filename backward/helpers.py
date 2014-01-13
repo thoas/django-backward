@@ -4,8 +4,7 @@ from __future__ import unicode_literals
 import pickle
 import logging
 
-from django.http import HttpResponseRedirect
-from django.http.request import QueryDict
+from django.http import HttpResponseRedirect, QueryDict
 from django.utils.importlib import import_module
 
 from .utils import scheme
