@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import pickle
 import logging
 
 from django.http import HttpResponseRedirect
+from django.http.request import QueryDict
 from django.utils.importlib import import_module
 
 from .utils import scheme
@@ -62,7 +65,7 @@ def run_next_action(request):
     parameters = data.get('parameters', None) or {}
 
     for key, values in parameters.items():
-        setattr(request, key, values)
+        setattr(request, key, QueryDict(values))
 
     view_name = action[action.rindex('.') + 1:]
 

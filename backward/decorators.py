@@ -32,7 +32,7 @@ def user_passes_test(test_func, login_url=None, message=None):
                     'kwargs': kwargs,
                     'method': request.method,
                     'parameters': {
-                        'POST': request.POST or None,
+                        'POST': request.POST.urlencode() if request.POST else None,
                     }
                 }
 

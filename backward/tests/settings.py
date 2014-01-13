@@ -49,3 +49,5 @@ MIDDLEWARE_CLASSES = (
 )
 
 LOGIN_REDIRECT_URL = '/backward/login/redirect/'
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
