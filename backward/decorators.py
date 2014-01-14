@@ -27,7 +27,7 @@ def user_passes_test(test_func, login_url=None, message=None):
                 from .helpers import save_next_action
 
                 data = {
-                    'action': '%s.%s' % (view_func.__module__, view_func.__name__),
+                    'action': request.META.get('PATH_INFO'),
                     'args': args,
                     'kwargs': kwargs,
                     'method': request.method,

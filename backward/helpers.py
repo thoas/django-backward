@@ -5,7 +5,7 @@ import pickle
 import logging
 
 from django.http import HttpResponseRedirect, QueryDict
-from django.utils.importlib import import_module
+from django.core.urlresolvers import resolve, Resolver404
 
 from .utils import scheme
 
@@ -51,7 +51,10 @@ def run_next_action(request):
     if not data or not 'action' in data:
         return False
 
-    action = data['action']
+    try:
+        view, view_args, view_kwargs = resolve(data['action'])
+    except Resolver404:
+        return False
 
     args = data.get('args', None) or []
 
@@ -66,30 +69,21 @@ def run_next_action(request):
     for key, values in parameters.items():
         setattr(request, key, QueryDict(values))
 
-    view_name = action[action.rindex('.') + 1:]
+    try:
+        result = view(request, *args, **kwargs)
+    except Exception as e:
+        logger.error(e)
 
-    module_name = action[:action.rindex('.')]
+        return False
 
-    module = import_module(module_name)
+    delete_next_action(request)
 
-    if hasattr(module, view_name):
-        view = getattr(module, view_name)
+    if result and isinstance(result, HttpResponseRedirect):
+        set_url_redirect(request, result['Location'])
 
-        try:
-            result = view(request, *args, **kwargs)
+        if 'redirect_url' in data:
+            return HttpResponseRedirect(data['redirect_url'])
 
-            delete_next_action(request)
-
-            if result and isinstance(result, HttpResponseRedirect):
-                set_url_redirect(request, result['Location'])
-
-                if 'redirect_url' in data:
-                    return HttpResponseRedirect(data['redirect_url'])
-
-                return HttpResponseRedirect('%s://%s%s' % (scheme(request),
-                                                           request.get_host(),
-                                                           settings.LOGIN_REDIRECT_URL))
-        except Exception as e:
-            logger.error(e)
-
-    return False
+        return HttpResponseRedirect('%s://%s%s' % (scheme(request),
+                                                   request.get_host(),
+                                                   settings.LOGIN_REDIRECT_URL))
