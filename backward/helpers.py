@@ -5,7 +5,7 @@ import pickle
 import logging
 
 from django.http import HttpResponseRedirect, QueryDict
-from django.core.urlresolvers import resolve, Resolver404
+from django.core.urlresolvers import resolve
 
 from .utils import scheme
 
@@ -53,7 +53,9 @@ def run_next_action(request):
 
     try:
         view, view_args, view_kwargs = resolve(data['action'])
-    except Resolver404:
+    except Exception as e:
+        logger.error(e)
+
         return False
 
     args = data.get('args', None) or []
