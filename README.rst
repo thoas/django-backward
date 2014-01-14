@@ -10,6 +10,17 @@ An application to store your previous history in your session engine backend.
 With this application you will be able to redirect your users to their previous
 location when they tried to access a page where the login is required.
 
+.. image:: http://cl.ly/image/371E2R0L3n2h/backward_redirect.png
+
+You will be also able to record previous action which needed login required.
+
+For example, if your user is not logged in your application and try to execute
+an action which required authentication (e.g.: an user clicks on a button to follow another user),
+this application will record parameters (even on POST) and execute the last action
+when your user will be successfully logged.
+
+.. image:: http://cl.ly/image/3B2E0H2M0j1C/backward_action.png
+
 Thanks to `oleiade <https://github.com/oleiade>`_ for the name.
 
 Compatibility
