@@ -71,4 +71,6 @@ Installation
 
 5. Configure your `Session engine <https://docs.djangoproject.com/en/dev/topics/http/sessions/#configuring-the-session-engine>`_
 
+6. Use the decorator ``backward.decorators.login_required`` if your views need authentication
+
 .. _GitHub: https://github.com/thoas/django-backward
