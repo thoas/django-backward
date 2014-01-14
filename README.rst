@@ -5,7 +5,7 @@ django-backward
     :alt: Build Status
     :target: http://travis-ci.org/thoas/django-backward
 
-An application to store your previous history in your session engine backend.
+A Django application to store your previous history and action in your session engine.
 
 With this application you will be able to redirect your users to their previous
 location when they tried to access a page where the login is required.

@@ -12,7 +12,7 @@ with open(os.path.join(root, 'README.rst')) as f:
 setup(
     name='django-backward',
     version=version,
-    description='An application to store your previous history with multiple backends',
+    description='A Django application to store your previous history and action in your session engine',
     long_description=README,
     author='Florent Messa',
     author_email='florent.messa@gmail.com',
