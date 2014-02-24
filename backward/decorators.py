@@ -21,7 +21,7 @@ def user_passes_test(test_func, login_url=None, message=None):
                 return view_func(request, *args, **kwargs)
 
             if message is not None:
-                messages.info(request, message)
+                messages.info(request, message, fail_silently=True)
 
             if request.method != 'GET':
                 from .helpers import save_next_action
