@@ -23,6 +23,8 @@ def user_passes_test(test_func, login_url=None, message=None):
             if message is not None:
                 messages.info(request, message, fail_silently=True)
 
+            response = HttpResponseRedirect(login_url)
+
             if request.method != 'GET':
                 from .helpers import save_next_action
 
@@ -36,9 +38,9 @@ def user_passes_test(test_func, login_url=None, message=None):
                     }
                 }
 
-                save_next_action(request, data)
+                save_next_action(request, response, data)
 
-            return HttpResponseRedirect(login_url)
+            return response
         return wraps(view_func, assigned=available_attrs(view_func))(_wrapped_view)
     return decorator
 

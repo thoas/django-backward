@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.urlresolvers import resolve, Resolver404
 
-from .helpers import get_url_redirect, set_url_redirect, run_next_action
+from .helpers import save_url_redirect, run_next_action
 from .utils import scheme
 from . import settings
 
@@ -35,30 +35,19 @@ class BackwardMiddleware(object):
 
         return result
 
-    def manage_redirection(self, request):
-        update_url_redirect = True
-
-        url_redirect = get_url_redirect(request)
-
-        if self._is_exempt(request):
-            update_url_redirect = False
-
-        if update_url_redirect:
-            url_redirect = '%s://%s%s' % (scheme(request),
-                                          request.get_host(),
-                                          request.path_info)
-
-        set_url_redirect(request, url_redirect)
-
     def process_request(self, request):
-        if not self._is_exempt(request):
-            result = self.manage_redirection(request)
-
-            if result:
-                return result
-
         if request.user and request.user.is_authenticated():
             result = run_next_action(request)
 
             if result:
                 return result
+
+    def process_response(self, request, response):
+        if not self._is_exempt(request):
+            url_redirect = '%s://%s%s' % (scheme(request),
+                                          request.get_host(),
+                                          request.path_info)
+
+            save_url_redirect(request, response, url_redirect)
+
+        return response

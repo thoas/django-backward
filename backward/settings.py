@@ -46,3 +46,8 @@ IGNORE_AJAX = getattr(settings,
 LOGIN_REDIRECT_URL = getattr(settings,
                              'BACKWARD_LOGIN_REDIRECT_URL',
                              settings.LOGIN_REDIRECT_URL)
+
+
+BACKEND_CLASS = getattr(settings,
+                        'BACKWARD_BACKEND_CLASS',
+                        'backward.backends.session.SessionBackend')

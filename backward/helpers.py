@@ -1,43 +1,38 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import pickle
 import logging
 
 from django.http import HttpResponseRedirect, QueryDict
 from django.core.urlresolvers import resolve
 
-from .utils import scheme
+from .utils import scheme, load_class
 
 from . import settings
 
 logger = logging.getLogger('backward')
 
+engine = load_class(settings.BACKEND_CLASS)()
+
 
 def get_url_redirect(request):
-    return request.session.get(settings.URL_REDIRECT_NAME, None)
+    return engine.get_url_redirect(request)
 
 
-def set_url_redirect(request, url_redirect):
-    request.session[settings.URL_REDIRECT_NAME] = url_redirect
+def save_url_redirect(request, response, url_redirect):
+    engine.save_url_redirect(request, response, url_redirect)
 
 
-def save_next_action(request, data):
-    request.session[settings.NEXT_ACTION_NAME] = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
+def save_next_action(request, response, data):
+    engine.save_next_action(request, response, data)
 
 
 def get_next_action(request):
-    if settings.NEXT_ACTION_NAME in request.session:
-        return pickle.loads(request.session[settings.NEXT_ACTION_NAME])
-
-    return {}
+    return engine.get_next_action(request)
 
 
 def delete_next_action(request):
-    try:
-        del request.session[settings.NEXT_ACTION_NAME]
-    except KeyError:
-        pass
+    engine.delete_next_action(request)
 
 
 def run_next_action(request):
@@ -48,7 +43,7 @@ def run_next_action(request):
     except Exception, e:
         logger.error(e)
 
-    if not data or not 'action' in data:
+    if not data or 'action' not in data:
         return False
 
     try:
@@ -81,7 +76,7 @@ def run_next_action(request):
     delete_next_action(request)
 
     if result and isinstance(result, HttpResponseRedirect):
-        set_url_redirect(request, result['Location'])
+        save_url_redirect(request, result['Location'])
 
         if 'redirect_url' in data:
             return HttpResponseRedirect(data['redirect_url'])
