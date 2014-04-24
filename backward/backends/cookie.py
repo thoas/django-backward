@@ -15,7 +15,7 @@ class CookieBackend(Backend):
         return request.COOKIES.get(settings.URL_REDIRECT_NAME, None)
 
     def save_url_redirect(self, request, response, url_redirect):
-        self.set_cookie(response, url_redirect, cookie_name=settings.URL_REDIRECT_NAME)
+        self.set_cookie(request, response, url_redirect, cookie_name=settings.URL_REDIRECT_NAME)
 
     def get_next_action(self, request):
         if settings.NEXT_ACTION_NAME in request.COOKIES:
@@ -24,7 +24,8 @@ class CookieBackend(Backend):
         return {}
 
     def save_next_action(self, request, response, data):
-        self.set_cookie(response,
+        self.set_cookie(request,
+                        response,
                         pickle.dumps(data, pickle.HIGHEST_PROTOCOL),
                         cookie_name=settings.NEXT_ACTION_NAME)
 
@@ -36,15 +37,24 @@ class CookieBackend(Backend):
 
         return True
 
-    def set_cookie(self, response, value, cookie_name):
+    def set_cookie(self, request, response, value, cookie_name):
         max_age = settings.COOKIE_MAX_AGE
 
         expires = datetime.strftime(datetime.utcnow() + timedelta(seconds=max_age),
                                     "%a, %d-%b-%Y %H:%M:%S GMT")
 
+        cookie_domain = settings.COOKIE_DOMAIN
+
+        if cookie_domain and cookie_domain.startswith('.'):
+            host = '.'.join(request.get_host().split('.')[-2:])
+
+            cookie_domain = cookie_domain % {
+                'host': host
+            }
+
         response.set_cookie(cookie_name,
                             value,
                             max_age=max_age,
                             expires=expires,
-                            domain=settings.COOKIE_DOMAIN,
+                            domain=cookie_domain,
                             secure=settings.COOKIE_SECURE or None)
