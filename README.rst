@@ -5,7 +5,8 @@ django-backward
     :alt: Build Status
     :target: http://travis-ci.org/thoas/django-backward
 
-A Django application to store your previous history and action in your session engine.
+A Django application to store your previous history and action using differents
+backends.
 
 With this application you will be able to redirect your users to their previous
 location when they tried to access a page where the login is required.
@@ -69,8 +70,33 @@ Installation
 
     LOGIN_REDIRECT_URL = '/backward/login/redirect/'
 
-5. Configure your `Session engine <https://docs.djangoproject.com/en/dev/topics/http/sessions/#configuring-the-session-engine>`_
+5. Configure your `Session engine <https://docs.djangoproject.com/en/dev/topics/http/sessions/#configuring-the-session-engine>`_ if you are using the default backend
 
 6. Use the decorator ``backward.decorators.login_required`` if your views need authentication
+
+
+Configuration
+-------------
+
+``BACKEND_BACKEND_CLASS``
+.........................
+
+The backend used to store information.
+
+The default backend class is ``backward.backends.session.SessionBackend``.
+
+``backwards.backends.session.SessionBackend``
+.............................................
+
+Store information in ``request.session`` using your `Session engine <https://docs.djangoproject.com/en/dev/topics/http/sessions/#configuring-the-session-engine>`_
+
+``backwards.backends.session.CookieBackend``
+............................................
+
+Store information in ``request.COOKIES``, you can configure a few things:
+
+- ``BACKWARD_MAX_AGE``: the age used to set an expiration date to the cookie
+- ``BACKWARD_COOKIE_DOMAIN``: the domain name used for the cookie
+- ``BACKWARD_COOKIE_SECURE``: if this is set to True, the cookie will be marked as **secure**, which means browsers may ensure that the cookie is only sent under an HTTPS connection.
 
 .. _GitHub: https://github.com/thoas/django-backward

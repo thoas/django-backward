@@ -51,3 +51,9 @@ LOGIN_REDIRECT_URL = getattr(settings,
 BACKEND_CLASS = getattr(settings,
                         'BACKWARD_BACKEND_CLASS',
                         'backward.backends.session.SessionBackend')
+
+COOKIE_DOMAIN = getattr(settings, 'BACKWARD_COOKIE_DOMAIN', settings.SESSION_COOKIE_DOMAIN)
+
+COOKIE_SECURE = getattr(settings, 'BACKWARD_COOKIE_SECURE', settings.SESSION_COOKIE_SECURE)
+
+COOKIE_MAX_AGE = getattr(settings, 'BACKWARD_COOKIE_MAX_AGE', 3600)
