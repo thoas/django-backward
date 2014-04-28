@@ -38,12 +38,17 @@ class CookieBackend(Backend):
         expires = datetime.strftime(datetime.utcnow() + timedelta(seconds=max_age),
                                     "%a, %d-%b-%Y %H:%M:%S GMT")
 
-        response.set_cookie(cookie_name,
-                            value,
-                            max_age=max_age,
-                            expires=expires,
-                            domain=self.get_cookie_domain(request),
-                            secure=settings.COOKIE_SECURE or None)
+        try:
+            response.set_cookie(cookie_name,
+                                value,
+                                max_age=max_age,
+                                expires=expires,
+                                domain=self.get_cookie_domain(request),
+                                secure=settings.COOKIE_SECURE or None)
+        except UnicodeEncodeError:
+            return False
+
+        return True
 
     def get_cookie_domain(self, request):
         cookie_domain = settings.COOKIE_DOMAIN
