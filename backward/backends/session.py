@@ -24,7 +24,7 @@ class SessionBackend(Backend):
     def save_next_action(self, request, response, data):
         request.session[settings.NEXT_ACTION_NAME] = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
 
-    def delete_next_action(self, request):
+    def delete_next_action(self, request, response):
         try:
             del request.session[settings.NEXT_ACTION_NAME]
         except KeyError:
