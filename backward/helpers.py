@@ -88,3 +88,5 @@ def run_next_action(request):
         delete_next_action(request, response)
 
         return response
+
+    return result
