@@ -31,8 +31,8 @@ def get_next_action(request):
     return engine.get_next_action(request)
 
 
-def delete_next_action(request):
-    engine.delete_next_action(request)
+def delete_next_action(request, response):
+    engine.delete_next_action(request, response)
 
 
 def run_next_action(request):
@@ -73,14 +73,18 @@ def run_next_action(request):
 
         return False
 
-    delete_next_action(request)
+    delete_next_action(request, result)
 
     if result and isinstance(result, HttpResponseRedirect):
         save_url_redirect(request, result, result['Location'])
 
         if 'redirect_url' in data:
-            return HttpResponseRedirect(data['redirect_url'])
+            response = HttpResponseRedirect(data['redirect_url'])
 
-        return HttpResponseRedirect('%s://%s%s' % (scheme(request),
-                                                   request.get_host(),
-                                                   settings.LOGIN_REDIRECT_URL))
+        response = HttpResponseRedirect('%s://%s%s' % (scheme(request),
+                                                       request.get_host(),
+                                                       settings.LOGIN_REDIRECT_URL))
+
+        delete_next_action(request, response)
+
+        return response

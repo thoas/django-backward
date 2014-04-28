@@ -29,13 +29,8 @@ class CookieBackend(Backend):
                         pickle.dumps(data, pickle.HIGHEST_PROTOCOL),
                         cookie_name=settings.NEXT_ACTION_NAME)
 
-    def delete_next_action(self, request):
-        try:
-            del request.COOKIES[settings.NEXT_ACTION_NAME]
-        except KeyError:
-            return False
-
-        return True
+    def delete_next_action(self, request, response):
+        response.delete_cookie(settings.NEXT_ACTION_NAME, domain=self.get_cookie_domain(request))
 
     def set_cookie(self, request, response, value, cookie_name):
         max_age = settings.COOKIE_MAX_AGE
@@ -43,6 +38,14 @@ class CookieBackend(Backend):
         expires = datetime.strftime(datetime.utcnow() + timedelta(seconds=max_age),
                                     "%a, %d-%b-%Y %H:%M:%S GMT")
 
+        response.set_cookie(cookie_name,
+                            value,
+                            max_age=max_age,
+                            expires=expires,
+                            domain=self.get_cookie_domain(request),
+                            secure=settings.COOKIE_SECURE or None)
+
+    def get_cookie_domain(self, request):
         cookie_domain = settings.COOKIE_DOMAIN
 
         if cookie_domain and cookie_domain.startswith('.'):
@@ -52,9 +55,4 @@ class CookieBackend(Backend):
                 'host': host
             }
 
-        response.set_cookie(cookie_name,
-                            value,
-                            max_age=max_age,
-                            expires=expires,
-                            domain=cookie_domain,
-                            secure=settings.COOKIE_SECURE or None)
+        return cookie_domain
