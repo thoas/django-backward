@@ -76,7 +76,7 @@ def run_next_action(request):
     delete_next_action(request)
 
     if result and isinstance(result, HttpResponseRedirect):
-        save_url_redirect(request, result['Location'])
+        save_url_redirect(request, result, result['Location'])
 
         if 'redirect_url' in data:
             return HttpResponseRedirect(data['redirect_url'])
