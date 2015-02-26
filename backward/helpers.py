@@ -5,6 +5,7 @@ import logging
 
 from django.http import HttpResponseRedirect, QueryDict
 from django.core.urlresolvers import resolve
+from django.utils.encoding import smart_str
 
 from .utils import scheme, load_class
 
@@ -64,7 +65,7 @@ def run_next_action(request):
     parameters = data.get('parameters', None) or {}
 
     for key, values in parameters.items():
-        setattr(request, key, QueryDict(values))
+        setattr(request, key, QueryDict(smart_str(values)))
 
     try:
         result = view(request, *args, **kwargs)
