@@ -3,7 +3,11 @@ from django.contrib.auth.models import User
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.conf import settings as djsettings
-from django.utils import importlib
+
+try:
+    from importlib import import_module
+except ImportError:
+    from django.utils.importlib import import_module
 
 from backward import settings
 
@@ -11,7 +15,7 @@ from backward import settings
 class BasicTests(TestCase):
     def setUp(self):
         settings.SESSION_ENGINE = 'django.contrib.sessions.backends.file'
-        engine = importlib.import_module('django.contrib.sessions.backends.file')
+        engine = import_module('django.contrib.sessions.backends.file')
         store = engine.SessionStore()
         store.save()
 
