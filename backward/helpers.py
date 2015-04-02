@@ -41,7 +41,7 @@ def run_next_action(request):
 
     try:
         data = get_next_action(request)
-    except Exception, e:
+    except Exception as e:
         logger.error(e)
 
     if not data or 'action' not in data:

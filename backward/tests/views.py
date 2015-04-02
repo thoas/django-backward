@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 
 from backward.decorators import login_required
 
@@ -17,9 +18,9 @@ def login_simple(request):
 @login_required
 @require_http_methods(['POST'])
 def action_simple(request, *args, **kwargs):
-    for k, v in request.POST.iteritems():
+    for k, v in request.POST.items():
         request.session[k] = v
 
     request.session['sent'] = True
 
-    return HttpResponse('Ok')
+    return HttpResponse(reverse('login_simple'))

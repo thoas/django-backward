@@ -1,8 +1,10 @@
+import mock
+
 from django.test import TestCase
 from django.contrib.auth.models import User
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.conf import settings as djsettings
+from django.utils.encoding import smart_text
 
 try:
     from importlib import import_module
@@ -10,6 +12,7 @@ except ImportError:
     from django.utils.importlib import import_module
 
 from backward import settings
+from backward.helpers import engine
 
 
 class BasicTests(TestCase):
@@ -21,8 +24,6 @@ class BasicTests(TestCase):
 
         self.session = store
         self.client.cookies[djsettings.SESSION_COOKIE_NAME] = store.session_key
-
-        reload(settings)
 
     def test_ajax_simple(self):
         response = self.client.get(reverse('simple'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -39,22 +40,18 @@ class BasicTests(TestCase):
         self.assertEqual(self.client.session['url_redirect'], u'http://testserver/simple/')
 
     def test_ignorable(self):
-        with override_settings(BACKWARD_IGNORE_VIEWNAMES=(
+        with mock.patch.object(settings, 'IGNORE_VIEWNAMES', (
             'simple',
         )):
-            reload(settings)
-
             response = self.client.get(reverse('simple'))
 
             self.assertEqual(response.status_code, 200)
 
             self.assertNotIn('url_redirect', self.client.session)
 
-        with override_settings(BACKWARD_IGNORE_URLS=(
+        with mock.patch.object(settings, 'IGNORE_URLS', (
             '/simple/',
         )):
-            reload(settings)
-
             response = self.client.get(reverse('simple'))
 
             self.assertEqual(response.status_code, 200)
@@ -62,11 +59,9 @@ class BasicTests(TestCase):
             self.assertNotIn('url_redirect', self.client.session)
 
     def test_login_redirect(self):
-        with override_settings(BACKWARD_START_IGNORE_URLS=(
+        with mock.patch.object(settings, 'START_IGNORE_URLS', (
             '/auth/',
         )):
-            reload(settings)
-
             response = self.client.get(reverse('login_simple'))
 
             self.assertEqual(response.status_code, 302)
@@ -93,13 +88,11 @@ class BasicTests(TestCase):
                                  target_status_code=200)
 
     def test_action_simple(self):
-        with override_settings(BACKWARD_START_IGNORE_URLS=(
+        with mock.patch.object(settings, 'START_IGNORE_URLS', (
             '/auth/',
         )):
-            reload(settings)
-
             parameters = {
-                'key': 'value'
+                smart_text('key'): 'value'
             }
 
             response = self.client.post(reverse('action_simple'), data=parameters)
@@ -108,6 +101,11 @@ class BasicTests(TestCase):
 
             User.objects.create_user('newbie', 'newbie@example.com', '$ecret')
 
+            data = engine.get_next_action(self.client)
+
+            assert 'parameters' in data
+            assert 'POST' in data['parameters']
+
             response = self.client.post(reverse('login'), data={
                 'username': 'newbie',
                 'password': '$ecret'
@@ -115,6 +113,5 @@ class BasicTests(TestCase):
 
             response = self.client.get(reverse('backward_login_redirect'))
 
-            for k, v in parameters.items():
-                self.assertIn(k, self.client.session)
-                self.assertEqual(self.client.session[k], v)
+            assert 'sent' in self.client.session
+            assert self.client.session['sent'] is True
