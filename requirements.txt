@@ -1,3 +1,0 @@
-Django
-django-discover-runner
-coverage

@@ -1,11 +1,9 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 
 from . import views
 
 
-urlpatterns = patterns(
-    '',
-
+urlpatterns = [
     url(r'^simple/$',
         views.simple,
         name='simple'),
@@ -23,4 +21,4 @@ urlpatterns = patterns(
 
     url(r'^backward/',
         include('backward.urls')),
-)
+]

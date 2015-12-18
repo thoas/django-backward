@@ -1,11 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from . import views
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^login/redirect/$',
         views.LoginRedirectView.as_view(),
         name='backward_login_redirect'),
-)
+]
